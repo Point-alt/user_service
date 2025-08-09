@@ -2,10 +2,13 @@ package userservice;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
 public class UserDao {
+    private static final Logger logger = LogManager.getLogger(UserDao.class);
 
     public void save(User user) {
         Transaction transaction = null;
@@ -15,7 +18,7 @@ public class UserDao {
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
-            System.err.println("Ошибка при создании юзера: " + e.getMessage());
+            logger.error("Ошибка при создании юзера: " + e.getMessage());
         }
     }
 
@@ -23,7 +26,7 @@ public class UserDao {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(User.class, id);
         } catch (Exception e) {
-            System.err.println("Ошибка при получении ID: " + e.getMessage());
+            logger.error("Ошибка при получении ID: " + e.getMessage());
             return null;
         }
     }
@@ -32,7 +35,7 @@ public class UserDao {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery("from User", User.class).list();
         } catch (Exception e) {
-            System.err.println("Ошибка при получении списка: " + e.getMessage());
+            logger.error("Ошибка при получении списка: " + e.getMessage());
             return List.of();
         }
     }
@@ -45,7 +48,7 @@ public class UserDao {
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
-            System.err.println("Ошибка при обновлении: " + e.getMessage());
+            logger.error("Ошибка при обновлении: " + e.getMessage());
         }
     }
 
@@ -57,7 +60,7 @@ public class UserDao {
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
-            System.err.println("Ошибка при удалении: " + e.getMessage());
+            logger.error("Ошибка при удалении: " + e.getMessage());
         }
     }
 }

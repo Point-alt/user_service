@@ -18,6 +18,6 @@
 
         <property name="hibernate.connection.pool_size">5</property>
 
-        <mapping class="com.example.userservice.model.User"/>
+        <mapping class="userservice.User"/>
     </session-factory>
 </hibernate-configuration>

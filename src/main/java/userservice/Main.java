@@ -58,6 +58,7 @@ public class Main {
         User user = userdao.getById(id);
         if (user == null) {
             System.out.println("Пользователь не найден");
+            return;
         }
         System.out.println("Новое имя: ");
         String name = scanner.nextLine();
@@ -77,6 +78,7 @@ public class Main {
             } catch (NumberFormatException e) {}
         }
 
+
         userdao.update(user);
         System.out.println("Пользователь " + user + " обновлен");
     }
@@ -88,6 +90,7 @@ public class Main {
             id = Long.parseLong(scanner.nextLine());
         } catch (NumberFormatException e) {
             System.out.println("Пользователь не найден");
+            return;
         }
 
         User user = userdao.getById(id);
@@ -111,6 +114,7 @@ public class Main {
                 case "3" -> updateUser();
                 case "4" -> deleteUser();
                 case "5" -> running=false;
+                default -> System.out.println("Некорректный ввод");
             }
         }
     }

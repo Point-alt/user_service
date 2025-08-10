@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 public class HibernateUtil {
     private static final Logger logger = LogManager.getLogger(HibernateUtil.class);
-    private static final SessionFactory sessionFactory = buildSessionFactory();
+    private static SessionFactory sessionFactory = buildSessionFactory();
 
     private HibernateUtil(){};
 
@@ -18,6 +18,13 @@ public class HibernateUtil {
             logger.error("Ошибка при создании SessionFactory", ex);
             throw new ExceptionInInitializerError(ex);
         }
+    }
+
+    public static void rebuildSessionFactory(){
+        if (sessionFactory != null) {
+            sessionFactory.close();
+        }
+        sessionFactory = buildSessionFactory();
     }
 
     public static SessionFactory getSessionFactory() {

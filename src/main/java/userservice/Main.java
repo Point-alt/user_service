@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static final UserDao userdao = new UserDao();
+    private static final UserService userService = new UserService(new UserDao());
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void menu() {
@@ -30,17 +30,12 @@ public class Main {
             age = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {}
 
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setAge(age);
-
-        userdao.save(user);
-        System.out.println("Юзер " + user + " добавлен");
+        userService.createUser(name, email, age);
+        System.out.println("Юзер добавлен");
     }
 
     private static void listUsers() {
-        List<User> users = userdao.getAll();
+        List<User> users = userService.listUsers();
         if (users.isEmpty()) {
             System.out.println("Список пуст");
         } else {
@@ -55,32 +50,29 @@ public class Main {
             id = Long.parseLong(scanner.nextLine());
         } catch (NumberFormatException e) {}
 
-        User user = userdao.getById(id);
+        User user = userService.getUserById(id);
         if (user == null) {
             System.out.println("Пользователь не найден");
             return;
         }
         System.out.println("Новое имя: ");
         String name = scanner.nextLine();
-        if (!name.isBlank()) {
-            user.setName(name);
-        }
+
         System.out.println("Новый email: ");
         String email = scanner.nextLine();
-        if (!email.isBlank()) {
-            user.setEmail(email);
-        }
+
         System.out.println("Новый возраст: ");
         String ageStr = scanner.nextLine();
+        Integer age = null;
         if (!ageStr.isBlank()) {
             try {
-                user.setAge(Integer.parseInt(ageStr));
+                age = Integer.parseInt(ageStr);
             } catch (NumberFormatException e) {}
         }
 
+        userService.updateUser(user, name, email, age);
+        System.out.println("Пользователь обновлён");
 
-        userdao.update(user);
-        System.out.println("Пользователь " + user + " обновлен");
     }
 
     public static void deleteUser() {
@@ -93,10 +85,13 @@ public class Main {
             return;
         }
 
-        User user = userdao.getById(id);
+        User user = userService.getUserById(id);
+        if (user == null) {
+            System.out.println("Пользователь не найден");
+        }
 
-        userdao.delete(user);
-        System.out.println("Пользователь " + user + " удален");
+        userService.deleteUser(user);
+        System.out.println("Пользователь удален");
     }
 
 

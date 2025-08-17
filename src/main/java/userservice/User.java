@@ -23,4 +23,5 @@ public class User {
 
     @Column(name = "createdAt", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
 }

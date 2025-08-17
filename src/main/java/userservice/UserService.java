@@ -3,24 +3,24 @@ package userservice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
+
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     @Transactional
-    public User createUser(String name, String email, Integer age) {
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setAge(age);
+    public User createUser(UserDto userDto) {
+        User user = userMapper.userDtoToUser(userDto);
         return userRepository.save(user);
     }
 
@@ -31,25 +31,27 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User getUserById(long id) {
-        Optional<User> user = userRepository.findById(id);
-        return user.orElse(null);
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     @Transactional
-    public User updateUser (long id, String newName, String newEmail, Integer newAge) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if(optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            if (newName != null && !newName.isBlank()) user.setName(newName);
-            if (newEmail != null && !newEmail.isBlank()) user.setEmail(newEmail);
-            if (newAge != null) user.setAge(newAge);
-            return userRepository.save(user);
+    public User updateUser(long id, UserDto userDto) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        User updatedUser = userMapper.userDtoToUser(userDto);
+        updatedUser.setId(id);
+        updatedUser.setCreatedAt(existingUser.getCreatedAt());  // Сохраняем дату создания
+
+        return userRepository.save(updatedUser);
+    }
+
+    @Transactional
+    public void deleteUser(long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException(id);
         }
-        return null;
-    }
-
-    @Transactional
-    public void deleteUser (long id) {
         userRepository.deleteById(id);
     }
 }
